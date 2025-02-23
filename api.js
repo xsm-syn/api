@@ -101,7 +101,7 @@ app.get('/check', async (req, res) => {
             longitude: "",
             httpProtocol: "",
             tlsVersion: "",
-            thanks: "@bexnxx"
+            source: "@bexnxx"
             //error: error.message
         });
     }
