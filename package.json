@@ -1,0 +1,15 @@
+{
+  "name": "nodejs",
+  "version": "1.0.0",
+  "description": "proxyip checking",
+  "main": "api.js",
+  "scripts": {
+    "start": "node api.js"
+},
+  "keywords": [],
+  "author": "xsm",
+  "license": "ISC",
+  "dependencies": {
+    "express": "latest"
+   }
+}
