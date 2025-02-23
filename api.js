@@ -76,7 +76,14 @@ app.get('/check', async (req, res) => {
                 ...ipinfoh,
             });
         } else {
-            res.json({ proxyip: false });
+            res.json({
+                proxy: proxy,
+                port: port,                
+                proxyip: false,
+                delay: '0',
+                ip: myip,
+                ...srvip,
+            });
         }
     } catch (error) {      
         res.json({
