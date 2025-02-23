@@ -66,7 +66,25 @@ app.get('/:ipPort', async (req, res) => {
             res.json({ proxyip: false });
         }
     } catch (error) {
-        res.json({ proxyip: false, error: error.message});
+        res.json({
+              proxyip: false,
+              ip: '',
+              port: '0',
+              asn: '0',
+              org: '',
+              colo: '',
+              continent: '',
+              countryCode: '',
+              country: '',
+              region: '',
+              regionCode": '',
+              city: '',
+              postalCode: '',
+              timezone: '',
+              latitude: '',
+              longitude: '',
+              error: error.message
+        });
     }
 });
 
