@@ -52,56 +52,61 @@ app.get('/check', async (req, res) => {
     }
 
     const [proxy, port = 443] = ipPort.split(':');
-    if (!proxy || !port) {
-        return res.json({ error: "Missing or invalid 'ip' parameter" });
+    const portNum = parseInt(port, 10);
+
+    if (!proxy || isNaN(portNum) || portNum <= 0 || portNum > 65535) {
+        return res.json({ error: "Invalid 'ip' or 'port' parameter" });
     }
 
     try {
-        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port);
         const start = Date.now();
+        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, portNum);
         const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
         const end = Date.now();
         const delay = `${end - start} ms`;
-        const ipingfo = JSON.parse(ipinfo);
+
+        let ipingfo, srvip;
+        
+        try {
+            ipingfo = JSON.parse(ipinfo);
+        } catch (err) {
+            ipingfo = { error: "Invalid JSON response from proxy", details: ipinfo };
+        }
+
+        try {
+            srvip = JSON.parse(myips);
+        } catch (err) {
+            srvip = { error: "Invalid JSON response from server", details: myips };
+        }
+
         const { myip, ...ipinfoh } = ipingfo;
-        const srvip = JSON.parse(myips);
 
         if (myip && myip !== srvip.myip) {
             res.json({
-                proxyip: myip !== srvip.myip,
-                delay: delay,
-                proxy: proxy,
-                port: port,                
+                proxyip: true,
+                delay,
+                proxy,
+                port: portNum,                
                 ip: myip,
                 ...ipinfoh,
+                server_ip: srvip
             });
         } else {
-            res.json({ proxyip: false });
+            res.json({
+                proxyip: false,
+                delay,
+                proxy,
+                port: portNum,
+                server_ip: srvip
+            });
         }
     } catch (error) {
         res.json({
             proxyip: false,
             delay: "0 ms",
-            proxy: proxy,
-            port: port,
-            ip: "",
-            colo: "",
-            asn: "0",
-            continent: "",
-            flag: "",
-            org: "",
-            countryCode: "",
-            country: "",
-            city: "",
-            region: "",
-            regionCode: "",
-            postalCode: "",
-            timezone: "",
-            latitude: "",
-            longitude: "",
-            httpProtocol: "",
-            tlsVersion: ""
-            //error: error.message
+            proxy,
+            port: portNum,
+            error: error.message || "Unknown error"
         });
     }
 });
