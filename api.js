@@ -81,6 +81,7 @@ app.get('/check', async (req, res) => {
     } catch (error) {
         const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port);
         const ipingfo = JSON.parse(ipinfo);
+        const { myip, ...ipinfoh } = ipingfo;
         
         res.json({
             proxyip: false,
@@ -88,7 +89,7 @@ app.get('/check', async (req, res) => {
             proxy: proxy,
             port: port,                
             ip: myip,
-            ...ipingfo,
+            ...ipinfoh,
             //error: error.message
         });
     }
