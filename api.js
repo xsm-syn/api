@@ -79,28 +79,16 @@ app.get('/check', async (req, res) => {
             res.json({ proxyip: false });
         }
     } catch (error) {
+        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port);
+        const ipingfo = JSON.parse(ipinfo);
+        
         res.json({
             proxyip: false,
-            delay: "0 ms",
+            delay: delay,
             proxy: proxy,
-            port: port,
-            ip: "",
-            colo: "",
-            asn: "0",
-            continent: "",
-            flag: "",
-            org: "",
-            countryCode: "",
-            country: "",
-            city: "",
-            region: "",
-            regionCode: "",
-            postalCode: "",
-            timezone: "",
-            latitude: "",
-            longitude: "",
-            httpProtocol: "",
-            tlsVersion: ""
+            port: port,                
+            ip: myip,
+            ...ipingfo,
             //error: error.message
         });
     }
