@@ -46,10 +46,14 @@ app.get('/:ipPort', async (req, res) => {
     };
 
     try {
+        const start = Date.now();
         const [ipinfo, myips] = await Promise.all([
             sendRequest('myip.xsmnet.buzz', '/', true),
             sendRequest('myip.xsmnet.buzz', '/', false),
         ]);
+        const end = Date.now();
+        const delay = `${end - start} ms`;
+        
         const ipingfo = JSON.parse(ipinfo);
         const {myip, ...ipinfoh} = ipingfo
         const srvip = JSON.parse(myips);
@@ -57,6 +61,7 @@ app.get('/:ipPort', async (req, res) => {
         if (myip && myip !== srvip.myip) {
             res.json({
                 proxyip: myip !== srvip.myip,
+                delay: delay,
                 proxy: proxy,
                 port: port,                
                 ip: myip,
