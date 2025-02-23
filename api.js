@@ -57,14 +57,13 @@ app.get('/check', async (req, res) => {
     }
 
     try {
+        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port);
         const start = Date.now();
-        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port); // Pass proxy and port
+        const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
         const end = Date.now();
-        
-        const delay = `${end - start} ms`;    
+        const delay = `${end - start} ms`;
         const ipingfo = JSON.parse(ipinfo);
         const { myip, ...ipinfoh } = ipingfo;
-        const myips = await sendRequest('myip.xsmnet.buzz', '/', false); // No proxy used here
         const srvip = JSON.parse(myips);
 
         if (myip && myip !== srvip.myip) {
