@@ -1,7 +1,7 @@
 const express = require('express');
 const tls = require('tls');
 
-const app = express().set("json spaces", 2)
+const app = express().set("json spaces", 2);
 const PORT = process.env.PORT || 15787;
 
 app.get('/:ipPort', async (req, res) => {
@@ -9,6 +9,7 @@ app.get('/:ipPort', async (req, res) => {
     if (!proxy || !port) {
         return res.json({ error: "api check by after_sweet" });
     }
+    
     const sendRequest = (host, path, useProxy = true) => {
         return new Promise((resolve, reject) => {
             const socket = tls.connect({
@@ -46,15 +47,14 @@ app.get('/:ipPort', async (req, res) => {
     };
 
     try {
-        
-        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true);
         const start = Date.now();
-        const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
+        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true);
         const end = Date.now();
         
         const delay = `${end - start} ms`;    
         const ipingfo = JSON.parse(ipinfo);
-        const {myip, ...ipinfoh} = ipingfo
+        const { myip, ...ipinfoh } = ipingfo;
+        const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
         const srvip = JSON.parse(myips);
 
         if (myip && myip !== srvip.myip) {
@@ -71,25 +71,25 @@ app.get('/:ipPort', async (req, res) => {
         }
     } catch (error) {
         res.json({
-              proxyip: false,
-              delay: '0',
-              proxy: '',
-              port: '',
-              ip: '',
-              asn: '0',
-              org: '',
-              colo: '',
-              continent: '',
-              countryCode: '',
-              country: '',
-              region: '',
-              regionCode": '',
-              city: '',
-              postalCode: '',
-              timezone: '',
-              latitude: '',
-              longitude: '',
-              error: error.message
+            proxyip: false,
+            delay: '0',
+            proxy: '',
+            port: '',
+            ip: '',
+            asn: '0',
+            org: '',
+            colo: '',
+            continent: '',
+            countryCode: '',
+            country: '',
+            region: '',
+            regionCode: '',
+            city: '',
+            postalCode: '',
+            timezone: '',
+            latitude: '',
+            longitude: '',
+            error: error.message
         });
     }
 });
