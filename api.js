@@ -5,7 +5,7 @@ const app = express().set("json spaces", 2);
 const PORT = process.env.PORT || 15787;
 
 // Helper function to handle requests
-const sendRequest = (host, path, useProxy = true) => {
+const sendRequest = (host, path, useProxy = true, proxy = null, port = 443) => {
     return new Promise((resolve, reject) => {
         const socket = tls.connect({
             host: useProxy ? proxy : host,
@@ -54,18 +54,18 @@ app.get('/check', async (req, res) => {
 
     const [proxy, port = 443] = ipPort.split(':');
     if (!proxy || !port) {
-        return res.json({ error: "Missing 'ip' parameter" });
+        return res.json({ error: "Missing or invalid 'ip' parameter" });
     }
 
     try {
         const start = Date.now();
-        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true);
+        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port); // Pass proxy and port
         const end = Date.now();
         
         const delay = `${end - start} ms`;    
         const ipingfo = JSON.parse(ipinfo);
         const { myip, ...ipinfoh } = ipingfo;
-        const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
+        const myips = await sendRequest('myip.xsmnet.buzz', '/', false); // No proxy used here
         const srvip = JSON.parse(myips);
 
         if (myip && myip !== srvip.myip) {
