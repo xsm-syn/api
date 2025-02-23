@@ -67,11 +67,11 @@ app.get('/check', async (req, res) => {
         const srvip = JSON.parse(myips);
 
         if (myip && myip !== srvip.myip) {
-            res.json({
+            res.json({                
+                proxy: proxy,
+                port: port,
                 proxyip: myip !== srvip.myip,
                 delay: delay,
-                proxy: proxy,
-                port: port,                
                 ip: myip,
                 ...ipinfoh,
             });
@@ -80,10 +80,10 @@ app.get('/check', async (req, res) => {
         }
     } catch (error) {      
         res.json({
-            proxyip: false,
-            delay: "0 ms",
             proxy: proxy,
             port: port,
+            proxyip: false,
+            delay: "0 ms",
             ip: "",
             colo: "",
             asn: "0",
