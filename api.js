@@ -46,11 +46,12 @@ app.get('/:ipPort', async (req, res) => {
     };
 
     try {
-        const start = Date.now();
+        
         const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true);
-        const end = Date.now();  
+        const start = Date.now();
         const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
-            
+        const end = Date.now();
+        
         const delay = `${end - start} ms`;    
         const ipingfo = JSON.parse(ipinfo);
         const {myip, ...ipinfoh} = ipingfo
@@ -73,6 +74,20 @@ app.get('/:ipPort', async (req, res) => {
               proxyip: false,
               proxy: '',
               port: '',
+              ip: '',
+              asn: '0',
+              org: '',
+              colo: '',
+              continent: '',
+              countryCode: '',
+              country: '',
+              region: '',
+              regionCode": '',
+              city: '',
+              postalCode: '',
+              timezone: '',
+              latitude: '',
+              longitude: '',
               error: error.message
         });
     }
