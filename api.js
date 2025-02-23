@@ -56,63 +56,44 @@ app.get('/check', async (req, res) => {
         return res.json({ error: "Missing or invalid 'ip' parameter" });
     }
 
-    try {
-        const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port);
-        const start = Date.now();
-        const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
-        const end = Date.now();
-        const delay = `${end - start} ms`;
-        const ipingfo = JSON.parse(ipinfo);
-        const { myip, ...ipinfoh } = ipingfo;
-        const srvip = JSON.parse(myips);
+    try {            
+            const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true, proxy, port);
+            const start = Date.now();
+            const ipinfo2 = await sendRequest('myip.xsmnet.buzz', '/', false);
+            const end = Date.now();
+            const delay = `${end - start} ms`;
 
-        if (myip && myip !== srvip.myip) {
-            res.json({                
-                proxy: proxy,
+            if (!ipinfo) return resolve({ proxyip: false });
+
+            const ipingfo = JSON.parse(ipinfo.trim());
+            const ipingfo2 = JSON.parse(ipinfo2.trim());
+
+            if (ipingfo.myip && ipingfo.myip !== ipingfo2.myip) {
+                const { myip, ...ipinfoh } = ipingfo;
+                resolve({                    
+                    proxy: proxy,
+                    port: port,
+                    proxyip: true,
+                    delay: delay,
+                    ...ipinfoh
+                });
+            } else {
+                resolve({
+                    proxyip: false,
+                    proxy: proxy,
+                    port: port,
+                    ...ipingfo2
+                });
+            }
+        } catch (error) {
+            resolve({
+                proxyip: false,    
+                ip: proxy,
                 port: port,
-                proxyip: myip !== srvip.myip,
-                delay: delay,
-                ip: myip,
-                ...ipinfoh,
+                msg: error.message         
             });
-        } else {
-            res.json({
-                proxy: proxy,
-                port: port,                
-                proxyip: false,
-                delay: '0',
-                ip: myip,
-                ...srvip,
-            });
-        }
-    } catch (error) {      
-        res.json({
-            proxy: proxy,
-            port: port,
-            proxyip: false,
-            delay: "0 ms",
-            ip: "",
-            colo: "",
-            asn: "0",
-            continent: "",
-            flag: "",
-            org: "",
-            countryCode: "",
-            country: "",
-            city: "",
-            region: "",
-            regionCode: "",
-            postalCode: "",
-            timezone: "",
-            latitude: "",
-            longitude: "",
-            httpProtocol: "",
-            tlsVersion: "",
-            source: "bexnxx"
-            //error: error.message
-        });
-    }
-});
+       }
+}
 
 app.listen(PORT, () => {
     console.log(`Server berjalan di http://localhost:${PORT}`);
