@@ -49,7 +49,7 @@ app.get('/:ipPort', async (req, res) => {
         const start = Date.now();
         const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true);
         const end = Date.now();  
-        const myips = await sendRequest('myip.xsmnet.buzz', '/', false),
+        const myips = await sendRequest('myip.xsmnet.buzz', '/', false);
             
         const delay = `${end - start} ms`;    
         const ipingfo = JSON.parse(ipinfo);
