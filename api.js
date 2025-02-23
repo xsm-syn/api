@@ -4,7 +4,6 @@ const tls = require('tls');
 const app = express().set("json spaces", 2);
 const PORT = process.env.PORT || 15787;
 
-// Helper function to handle requests
 const sendRequest = (host, path, useProxy = true, proxy = null, port = 443) => {
     return new Promise((resolve, reject) => {
         const socket = tls.connect({
