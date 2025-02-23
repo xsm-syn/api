@@ -72,6 +72,7 @@ app.get('/:ipPort', async (req, res) => {
     } catch (error) {
         res.json({
               proxyip: false,
+              delay: '0',
               proxy: '',
               port: '',
               ip: '',
