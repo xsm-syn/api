@@ -1,14 +1,18 @@
 const express = require('express');
 const tls = require('tls');
 
-const app = express();
-const PORT = process.env.PORT || 57924;
+const app = express().set("json spaces", 2)
+const PORT = process.env.PORT || 15787;
 
-async function checkIP(ip, port) {
+app.get('/:ipPort', async (req, res) => {
+    const [proxy, port = 443] = req.params.ipPort.split(':');
+    if (!proxy || !port) {
+        return res.json({ error: "mana proxynya?" });
+    }
     const sendRequest = (host, path, useProxy = true) => {
         return new Promise((resolve, reject) => {
             const socket = tls.connect({
-                host: useProxy ? ip : host,
+                host: useProxy ? proxy : host,
                 port: useProxy ? port : 443,
                 servername: host
             }, () => {
@@ -34,74 +38,38 @@ async function checkIP(ip, port) {
                 reject(error);
             });
 
-            socket.setTimeout(3500, () => {
-                socket.destroy();
+            socket.setTimeout(5000, () => {
                 reject(new Error('Request timeout'));
+                socket.end();
             });
         });
     };
 
-    return new Promise(async (resolve) => {
-        if (!ip || !port) {
-            return resolve({ error: "missing parameter" });
-        }
+    try {
+        const [ipinfo, myips] = await Promise.all([
+            sendRequest('myip.bexcode.us.to', '/', true),
+            sendRequest('myip.bexcode.us.to', '/', false),
+        ]);
+        const ipingfo = JSON.parse(ipinfo);
+        const {myip, ...ipinfoh} = ipingfo
+        const srvip = JSON.parse(myips);
 
-        try {
-            const ipinfo = await sendRequest('myip.xsmnet.buzz', '/', true);
-            const ipinfo2 = await sendRequest('myip.xsmnet.buzz', '/', false);
-
-            if (!ipinfo) return resolve({ proxyip: false });
-
-            const ipingfo = JSON.parse(ipinfo.trim());
-            const ipingfo2 = JSON.parse(ipinfo2.trim());
-
-            if (ipingfo.myip && ipingfo.myip !== ipingfo2.myip) {
-                const { myip, ...ipinfoh } = ipingfo;
-                resolve({                    
-                    myip: ip,
-                    port: port,
-                    proxyip: true,
-                    ...ipinfoh
-                });
-            } else {
-                resolve({                    
-                    myip: ip,
-                    port: port
-                    proxyip: false,
-                });
-            }
-        } catch (error) {
-            resolve({
-                error: error.message
-                proxyip: false,
-                myip: ip,
-                port: port
+        if (myip && myip !== srvip.myip) {
+            res.json({
+                proxy: proxy,
+                port: port,
+                proxyip: myip !== srvip.myip,
+                ip: myip,
+                ...ipinfoh,
             });
+        } else {
+            res.json({ proxyip: false });
         }
-    });
-}
-
-app.get('/api', async (req, res) => {
-    const { check } = req.query;
-
-    if (!check || !check.includes(':')) {
-        return res.status(400).setHeader('Content-Type', 'application/json')
-            .send(JSON.stringify({ error: "api check by @after_sweet" }, null, 2));
+    } catch (error) {
+        res.json({ error: error.message, proxyip: false });
     }
-
-    const [ip, port] = check.split(':');
-
-    if (!ip || !port || isNaN(port)) {
-        return res.status(400).setHeader('Content-Type', 'application/json')
-            .send(JSON.stringify({ error: "api check by @after_sweet" }, null, 2));
-    }
-
-    const result = await checkIP(ip, parseInt(port, 10));
-    
-    res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(result, null, 2));
 });
 
 app.listen(PORT, () => {
-    console.log(`Server berjalan di http://127.0.0.1:${PORT}/api?check=1.2.3.4:443`);
+    console.log(`Server berjalan di http://localhost:${PORT}`);
 });
