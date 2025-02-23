@@ -82,8 +82,8 @@ app.get('/check', async (req, res) => {
         res.json({
             proxyip: false,
             delay: "0 ms",
-            proxy: "",
-            port: "0",
+            proxy: proxy,
+            port: port,
             ip: "",
             colo: "",
             asn: "0",
